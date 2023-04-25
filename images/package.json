@@ -1,0 +1,15 @@
+{
+  "name": "images",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "eartharoid",
+  "license": "MIT",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "sharp": "^0.32.0"
+  }
+}
