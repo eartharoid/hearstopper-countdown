@@ -71,12 +71,7 @@ for (let i = START; i <= END; i++) {
 			ctx.fillText('days until season 2', WIDTH/2, 420);
 	}
 
-	// console.log('Saving image %d...', i);
-	// const buffer = canvas.toBuffer('image/png');
-	// writeFileSync('generated/' + i + '.png', buffer);
-	const file = createWriteStream('generated/' + i + '.png');
-	const stream = canvas.createPNGStream();
-	stream.pipe(file);
+	canvas.createPNGStream().pipe(createWriteStream('generated/' + i + '.png'));
 }
 
 console.log('Finishing writing files...');

@@ -1,0 +1,16 @@
+name = "heartstopper"
+main = "src/index.js"
+compatibility_date = "2023-04-25"
+
+kv_namespaces = [
+  { binding = "USERS", id = "be64850ed0694a8f9f218f8690d73134", preview_id="be64850ed0694a8f9f218f8690d73134" }
+]
+
+[triggers]
+crons = ["0 6 * * *"]
+
+# SECRETS:
+# DISCORD_APPLICATION_ID
+# DISCORD_WEBHOOK_URL
+# DISCORD_PUBLIC_KEY
+# DISCORD_TOKEN
