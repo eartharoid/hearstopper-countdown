@@ -19,6 +19,7 @@ import {
 } from 'discord-interactions';
 import { getApplicationCommands } from './helpers';
 import { json } from 'itty-router-extras';
+import timezones from './timezones';
 
 export const COUNTDOWN_COMMAND = {
 	type: 1,
@@ -100,6 +101,21 @@ export const TIMEZONE_COMMAND = {
 	],
 	handle: async (interaction, { env, ctx }) => {
 		const timezone = interaction.data.options.find(option => option.name === 'timezone').value;
+
+		if (!timezones.includes(timezone)) {
+			return json({
+				type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+				data: {
+					embeds: [{
+						color: COLOUR,
+						title: ':x: Error',
+						description: `Please enter a valid timezone.`,
+						footer: { text: 'Made by eartharoid' }
+					}],
+				}
+			});
+		}
+
 		await env.USERS.put(interaction.member.user.id, JSON.stringify({ timezone }));
 		const commands = await getApplicationCommands(env, ctx);
 		const countdownCommandId = commands.find(command => command.name === 'countdown').id;
