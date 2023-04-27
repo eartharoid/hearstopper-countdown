@@ -9,8 +9,12 @@ kv_namespaces = [
 [triggers]
 crons = ["0 6 * * *"]
 
+[vars]
+ORIGIN="https://heartstopper.blackcatjackster6975.workers.dev"
+
 # SECRETS:
 # DISCORD_APPLICATION_ID
-# DISCORD_WEBHOOK_URL
 # DISCORD_PUBLIC_KEY
+# DISCORD_SECRET
 # DISCORD_TOKEN
+# DISCORD_WEBHOOK_URL

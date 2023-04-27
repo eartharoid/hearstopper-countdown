@@ -14,11 +14,40 @@ import {
 	TIMEZONE_COMMAND,
 } from './commands';
 import timezones from './timezones';
+import { DISCORD_API } from './config';
 
 const router = Router();
 
 router.get('/', (request, env) => {
 	return text(`👋 ${env.DISCORD_APPLICATION_ID}`);
+});
+
+router.get('/auth', (request, env) => {
+	const url = new URL(DISCORD_API + '/oauth2/authorize');
+	url.searchParams.set('client_id', env.DISCORD_APPLICATION_ID);
+	url.searchParams.set('redirect_uri', env.ORIGIN + '/auth/callback');
+	url.searchParams.set('response_type', 'code');
+	url.searchParams.set('scope', 'applications.commands webhook.incoming');
+	// return text(url.toString());
+	return Response.redirect(url.toString());
+});
+
+router.get('/auth/callback', async (request, env) => {
+	const { code } = request.query;
+	if (!code) return error(400, 'Bad Request');
+	const response = await fetch(DISCORD_API + '/oauth2/token', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: new URLSearchParams({
+			client_id: env.DISCORD_APPLICATION_ID,
+			client_secret: env.DISCORD_SECRET,
+			grant_type: 'authorization_code',
+			code: code,
+			redirect_uri: env.ORIGIN + '/auth/callback',
+		}).toString(),
+	});
+	const data = await response.json();
+	return json(data);
 });
 
 router.post('/interaction', async (request, env, ctx) => {
@@ -81,12 +110,4 @@ router.post('/interaction', async (request, env, ctx) => {
 
 router.all('*', () => error(404, 'Not Found'));
 
-export default async function fetch(request, env, ctx) {
-	return router.handle(request, env, ctx).catch(err => {
-		console.error({
-			url: request.url,
-			error: err,
-		});
-		return error(500, 'Internal Serverless Error');
-	});
-}
+export default router.handle;
