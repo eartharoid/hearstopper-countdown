@@ -7,7 +7,7 @@ kv_namespaces = [
 ]
 
 [triggers]
-crons = ["0 6 * * *"]
+crons = ["0 9 * * *"]
 
 [vars]
 ORIGIN="https://heartstopper.blackcatjackster6975.workers.dev"
