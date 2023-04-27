@@ -1,24 +1,30 @@
 import { Router } from 'itty-router';
 import {
 	error,
-	json
+	json,
+	text,
 } from 'itty-router-extras';
 import {
 	InteractionResponseType,
 	InteractionType,
 	verifyKey,
 } from 'discord-interactions';
+import {
+	COUNTDOWN_COMMAND,
+	TIMEZONE_COMMAND,
+} from './commands';
+import timezones from './timezones';
 
 const router = Router();
 
 router.get('/', (request, env) => {
-	return new Response(`👋 ${env.DISCORD_APPLICATION_ID}`);
+	return text(`👋 ${env.DISCORD_APPLICATION_ID}`);
 });
 
-router.post('/interaction', async (request, env) => {
+router.post('/interaction', async (request, env, ctx) => {
+	const body = await request.clone().arrayBuffer();
 	const signature = request.headers.get('x-signature-ed25519');
 	const timestamp = request.headers.get('x-signature-timestamp');
-	const body = await request.clone().arrayBuffer();
 	const isValidRequest = verifyKey(
 		body,
 		signature,
@@ -27,13 +33,13 @@ router.post('/interaction', async (request, env) => {
 	);
 
 	if (!isValidRequest) {
-		console.error('Invalid Request');
+		console.error('Bad Request Signature');
 		return error(401, 'Bad Request Signature');
 	}
 
-	const message = await request.json();
+	const interaction = await request.json();
 
-	switch (message.type) {
+	switch (interaction.type) {
 		case InteractionType.PING: {
 			console.log('Handling Ping request');
 			return json({
@@ -41,10 +47,30 @@ router.post('/interaction', async (request, env) => {
 			});
 		}
 		case InteractionType.APPLICATION_COMMAND: {
-			break;
+			const commands = [
+				COUNTDOWN_COMMAND,
+				TIMEZONE_COMMAND
+			];
+			const command = commands.find(command => command.name === interaction.data.name && command.type === interaction.data.type);
+			return await command.handle(interaction, { env, ctx });
 		}
 		case InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE: {
-			break;
+			const option = interaction.data.options.find(option => option.focused === true);
+			if (option.name === 'timezone') {
+				const choices = option.value ? timezones.filter(tz => tz.match(new RegExp(option.value, 'i'))) : timezones;
+				return json({
+					type: InteractionResponseType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT,
+					data: {
+						choices: choices.slice(0, 25).map(choice => ({
+							name: choice,
+							value: choice,
+						}))
+					}
+				});
+			} else {
+				console.error('Unknown Autocomplete Option');
+				return error(400, 'Unknown Autocomplete Option');
+			}
 		}
 		default: {
 			console.error('Unknown Interaction Type');
@@ -56,7 +82,7 @@ router.post('/interaction', async (request, env) => {
 router.all('*', () => error(404, 'Not Found'));
 
 export default async function fetch(request, env, ctx) {
-	return router.handle(request, env).catch(err => {
+	return router.handle(request, env, ctx).catch(err => {
 		console.error({
 			url: request.url,
 			error: err,
