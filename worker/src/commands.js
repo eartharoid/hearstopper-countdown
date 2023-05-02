@@ -9,10 +9,7 @@ import {
 	EVENT_NAME,
 	EVENT_UNTIL,
 } from './config';
-import {
-	getActualDaysLeftIncludingToday,
-	getTotalTimeLeft,
-} from './countdown';
+import { getTotalTimeLeft } from './countdown';
 import {
 	InteractionResponseType,
 	MessageComponentTypes,
@@ -27,11 +24,10 @@ export const COUNTDOWN_COMMAND = {
 	description: `Check how long is left until ${EVENT_UNTIL}`,
 	handle: async (interaction, { env }) => {
 		const { timezone } = await env.USERS.get(interaction.member.user.id, { type: 'json' }) || { timezone: 'UTC' };
-		const actualDays = getActualDaysLeftIncludingToday();
 		const { days, hours, minutes, seconds } = getTotalTimeLeft(timezone);
 		const unix = Math.floor(new Date(EVENT_DATE).getTime() / 1000);
 
-		if (actualDays < 1) {
+		if (days < 0) {
 			return json({
 				type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
 				data: {
@@ -54,7 +50,7 @@ export const COUNTDOWN_COMMAND = {
 					}]
 				}
 			});
-		} else if (actualDays === 1) {
+		} else if (actualDays === 0) {
 			return json({
 				type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
 				data: {
