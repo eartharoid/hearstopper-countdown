@@ -2,7 +2,7 @@ import { DISCORD_API } from './config';
 
 export async function getApplicationCommands(env, ctx) {
 	const key = '__cache:application.commands';
-	const cached = await env.USERS.get(key, { type: 'json', cacheTtl: 86400 });
+	const cached = await env.SETTINGS.get(key, { type: 'json', cacheTtl: 86400 });
 	if (cached) {
 		return cached;
 	} else {
@@ -12,7 +12,7 @@ export async function getApplicationCommands(env, ctx) {
 			}
 		});
 		const commands = await response.json();
-		ctx.waitUntil(env.USERS.put(key, JSON.stringify(commands), { expirationTtl: 172800 }));
+		ctx.waitUntil(env.SETTINGS.put(key, JSON.stringify(commands), { expirationTtl: 172800 }));
 		return commands;
 	}
 
@@ -20,7 +20,7 @@ export async function getApplicationCommands(env, ctx) {
 
 export async function getApplicationUser(env, ctx) {
 	const key = '__cache:application.user';
-	const cached = await env.USERS.get(key, { type: 'json', cacheTtl: 172800 });
+	const cached = await env.SETTINGS.get(key, { type: 'json', cacheTtl: 172800 });
 	if (cached) {
 		return cached;
 	} else {
@@ -30,7 +30,7 @@ export async function getApplicationUser(env, ctx) {
 			}
 		});
 		const commands = await response.json();
-		ctx.waitUntil(env.USERS.put(key, JSON.stringify(commands), { expirationTtl: 604800 }));
+		ctx.waitUntil(env.SETTINGS.put(key, JSON.stringify(commands), { expirationTtl: 604800 }));
 		return commands;
 	}
 

@@ -68,15 +68,21 @@ export default async function scheduled(event, env, ctx) {
 				};
 			}
 
-			await fetch(env.DISCORD_WEBHOOK_URL, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					username: user.username,
-					avatar_url: `${DISCORD_CDN}/avatars/${user.id}/${user.avatar}.png `,
-					...message,
-				})
-			});
+			const webhooks = await env.SETTINGS.get('__webhooks', { type: 'json' });
+			for (const webhook of webhooks) {
+				console.log(webhook);
+				ctx.waitUntil(
+					fetch(webhook.url, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							username: user.username,
+							avatar_url: `${DISCORD_CDN}/avatars/${user.id}/${user.avatar}.png `,
+							...message,
+						})
+					})
+				);
+			}
 		})()
 	);
 }

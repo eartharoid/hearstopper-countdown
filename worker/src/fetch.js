@@ -32,7 +32,7 @@ router.get('/auth', (request, env) => {
 	return Response.redirect(url.toString());
 });
 
-router.get('/auth/callback', async (request, env) => {
+router.get('/auth/callback', async (request, env, ctx) => {
 	const { code } = request.query;
 	if (!code) return error(400, 'Bad Request');
 	const response = await fetch(DISCORD_API + '/oauth2/token', {
@@ -47,6 +47,13 @@ router.get('/auth/callback', async (request, env) => {
 		}).toString(),
 	});
 	const data = await response.json();
+	const webhooks = await env.SETTINGS.get('__webhooks', { type: 'json' });
+	webhooks.push({
+		channelId: data.webhook.channel_id,
+		guildId: data.webhook.guild_id,
+		url: data.webhook.url,
+	});
+	ctx.waitUntil(env.SETTINGS.put('__webhooks', JSON.stringify(webhooks)));
 	return json(data);
 });
 

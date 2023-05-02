@@ -23,7 +23,7 @@ export const COUNTDOWN_COMMAND = {
 	name: 'countdown',
 	description: `Check how long is left until ${EVENT_UNTIL}`,
 	handle: async (interaction, { env }) => {
-		const { timezone } = await env.USERS.get(interaction.member.user.id, { type: 'json' }) || { timezone: 'UTC' };
+		const { timezone } = await env.SETTINGS.get('user:' + interaction.member.user.id, { type: 'json' }) || { timezone: 'UTC' };
 		const { days, hours, minutes, seconds } = getTotalTimeLeft(timezone);
 		const unix = Math.floor(new Date(EVENT_DATE).getTime() / 1000);
 
@@ -112,7 +112,7 @@ export const TIMEZONE_COMMAND = {
 			});
 		}
 
-		await env.USERS.put(interaction.member.user.id, JSON.stringify({ timezone }));
+		await env.SETTINGS.put('user:' + interaction.member.user.id, JSON.stringify({ timezone }));
 		const commands = await getApplicationCommands(env, ctx);
 		const countdownCommandId = commands.find(command => command.name === 'countdown').id;
 		return json({

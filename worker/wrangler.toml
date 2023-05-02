@@ -3,7 +3,7 @@ main = "src/index.js"
 compatibility_date = "2023-04-25"
 
 kv_namespaces = [
-  { binding = "USERS", id = "be64850ed0694a8f9f218f8690d73134", preview_id="be64850ed0694a8f9f218f8690d73134" }
+  { binding = "SETTINGS", id = "be64850ed0694a8f9f218f8690d73134", preview_id="be64850ed0694a8f9f218f8690d73134" }
 ]
 
 [triggers]
@@ -17,4 +17,3 @@ ORIGIN="https://heartstopper.blackcatjackster6975.workers.dev"
 # DISCORD_PUBLIC_KEY
 # DISCORD_SECRET
 # DISCORD_TOKEN
-# DISCORD_WEBHOOK_URL
