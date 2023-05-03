@@ -50,7 +50,7 @@ export const COUNTDOWN_COMMAND = {
 					}]
 				}
 			});
-		} else if (actualDays === 0) {
+		} else if (days === 0) {
 			return json({
 				type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
 				data: {
@@ -70,7 +70,7 @@ export const COUNTDOWN_COMMAND = {
 				data: {
 					embeds: [{
 						color: COLOUR,
-						title: `${actualDays} days left`, // :calendar_spiral:
+						title: `${days} days left`, // :calendar_spiral:
 						description: `There are **${days} days**, **${hours} hours**, **${minutes} minutes**, and **${seconds} seconds** left until ${EVENT_UNTIL} at <t:${unix}:F>.`,
 						footer: { text: `Timezone: ${timezone}` },
 						timestamp: new Date().toISOString(),
