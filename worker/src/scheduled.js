@@ -72,7 +72,7 @@ export default async function scheduled(event, env, ctx) {
 			for (const webhook of webhooks) {
 				console.log(webhook);
 				ctx.waitUntil(
-					fetch('https://en0mgsxmaxbpsf.x.pipedream.net/', {
+					fetch(webhook.url, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
