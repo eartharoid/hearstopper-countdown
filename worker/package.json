@@ -10,7 +10,7 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev --test-scheduled",
-    "deploy": "wrangler publish",
+    "deploy": "wrangler deploy",
     "ngrok": "ngrok http 8787",
     "register": "node -r dotenv/config register"
   },

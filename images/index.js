@@ -15,7 +15,7 @@ import sharp from 'sharp';
 
 // config
 const START = 0;
-const END = 100;
+const END = 150;
 const WIDTH = 800;
 const HEIGHT = 600;
 const FONT = 'HEAVYRUST';
@@ -55,12 +55,12 @@ for (let i = START; i <= END; i++) {
 	switch (i) {
 		case 0:
 			ctx.font = `172px ${FONT}`;
-			ctx.fillText('Season 2', WIDTH/2, 224);
+			ctx.fillText('Season 3', WIDTH/2, 224);
 			ctx.fillText('is out!', WIDTH/2, 416);
 			break;
 		case 1:
 			ctx.font = `72px ${FONT}`;
-			ctx.fillText('season 2 arrives', 400, 224);
+			ctx.fillText('season 3 arrives', 400, 224);
 			ctx.font = `196px ${FONT}`;
 			ctx.fillText('Tomorrow!', WIDTH/2, 356);
 			break;
@@ -68,7 +68,7 @@ for (let i = START; i <= END; i++) {
 			ctx.font = `256px ${FONT}`;
 			ctx.fillText(i.toString(), WIDTH/2, 236);
 			ctx.font = `96px ${FONT}`;
-			ctx.fillText('days until season 2', WIDTH/2, 420);
+			ctx.fillText('days until season 3', WIDTH/2, 420);
 	}
 
 	canvas.createPNGStream().pipe(createWriteStream('generated/' + i + '.png'));
