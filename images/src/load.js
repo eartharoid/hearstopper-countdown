@@ -1,45 +1,25 @@
 import {
-	existsSync,
 	readdirSync,
-	readFileSync,
 } from 'node:fs';
-import { createHash } from 'node:crypto';
-import sharp from 'sharp';
-import { WIDTH, HEIGHT } from './config.js';
+import useThreads from './threads.js';
 
 export default async function loadImages(dir, options) {
 	const files = readdirSync(dir);
+	const tasks = [];
 	const images = [];
 	for await (const file of files) {
-		const buffer = readFileSync(dir + '/' + file);
-		const md5 = createHash('md5').update(buffer).digest('hex');
-		let img = sharp(buffer, options);
-		const meta = await img.metadata();
-		const cachePath = `generated/.cache/${md5}.${meta.format}`; // file.split('.')[1]
-		const data = {
-			frames: meta.pages,
-			delay: meta.delay,
-			loops: meta.loop,
-		};
-		if (existsSync(cachePath)) {
-			console.log('  %s is cached', file)
-			images.push({
-				...data,
-				buffer: readFileSync(cachePath)
-			});
-		} else {
-			console.log('  processing %s', file);
-			img = img
-				.resize(WIDTH, HEIGHT)
-				.modulate({ brightness: 0.75 });
-			await img.toFile(cachePath);
-			images.push({
-				...data,
-				buffer: await img.toBuffer()
-			});
-		}
-		
-
+		tasks.push({
+			task: (preprocessor) => preprocessor.preprocess(dir + '/' + file, options),
+			callback: (image) => {
+				image.buffer = Buffer.from(image.buffer);
+				images.push(image);
+			},
+		});
 	}
+	await useThreads({
+		workerName: 'preprocessor',
+		workerPath: './workers/preprocessor.js',
+		tasks,
+	});
 	return images;
 }
