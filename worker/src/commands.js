@@ -14,7 +14,7 @@ import {
 	InteractionResponseType,
 	MessageComponentTypes,
 } from 'discord-interactions';
-import { getApplicationCommands } from './helpers';
+import { getApplicationCommands, getCountdownImageURL } from './helpers';
 import { json } from 'itty-router-extras';
 import timezones from './timezones';
 
@@ -45,7 +45,7 @@ export const COUNTDOWN_COMMAND = {
 						color: COLOUR,
 						title: `:tada: ${EVENT_NAME} is here!`,
 						description: EVENT_ARRIVED,
-						image: { url: `${CDN}/0.png` },
+						image: { url: getCountdownImageURL(0) },
 						footer: { text: 'Made by eartharoid' },
 					}]
 				}
@@ -58,7 +58,7 @@ export const COUNTDOWN_COMMAND = {
 						color: COLOUR,
 						title: `:face_holding_back_tears: Only ${hours} hours left!`,
 						description: `There are **${days} days**, **${hours} hours**, **${minutes} minutes**, and **${seconds} seconds** left until ${EVENT_UNTIL} (<t:${unix}:R>).`,
-						image: { url: `${CDN}/1.png` },
+						image: { url: getCountdownImageURL(1) },
 						footer: { text: `Timezone: ${timezone}` },
 						timestamp: new Date().toISOString(),
 					}]

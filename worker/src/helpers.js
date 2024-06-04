@@ -1,4 +1,15 @@
-import { DISCORD_API } from './config';
+import {
+	CDN,
+	DISCORD_API
+} from './config';
+
+export function getCountdownImageURL(days) {
+	if (days === 1 || days === 5 || days % 10 === 0) {
+		return `${CDN}/${days}-compressed.gif`;
+	} else {
+		return `${CDN}/${days}.png`;
+	}
+}
 
 export async function getApplicationCommands(env, ctx) {
 	const key = '__cache:application.commands';

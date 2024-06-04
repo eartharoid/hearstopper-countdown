@@ -12,7 +12,7 @@ import {
 	EVENT_UNTIL,
 } from './config';
 import { getDaysLeftIncludingToday } from "./countdown";
-import { getApplicationUser } from './helpers';
+import { getApplicationUser, getCountdownImageURL } from './helpers';
 import { MessageComponentTypes } from 'discord-interactions';
 
 export default async function scheduled(event, env, ctx) {
@@ -42,7 +42,7 @@ export default async function scheduled(event, env, ctx) {
 						color: COLOUR,
 						title: `:tada: ${EVENT_NAME} is here!`,
 						description: EVENT_ARRIVED,
-						image: { url: `${CDN}/${days}.png` },
+						image: { url: getCountdownImageURL(days) },
 						footer: { text: 'Made by eartharoid' },
 					}]
 				};
@@ -52,7 +52,7 @@ export default async function scheduled(event, env, ctx) {
 						color: COLOUR,
 						title: 'Only 1 day left!',
 						description: `${EVENT_IN} <t:${unix}:R>.`,
-						image: { url: `${CDN}/${days}.png` },
+						image: { url: getCountdownImageURL(days) },
 						footer: { text: 'Made by eartharoid' },
 					}]
 				};
@@ -62,7 +62,7 @@ export default async function scheduled(event, env, ctx) {
 						color: COLOUR,
 						title: `${days} days left`,
 						description: `There are **${days} days** left until ${EVENT_UNTIL}.`,
-						image: { url: `${CDN}/${days}.png` },
+						image: { url: getCountdownImageURL(days) },
 						footer: { text: 'Made by eartharoid' },
 					}]
 				};

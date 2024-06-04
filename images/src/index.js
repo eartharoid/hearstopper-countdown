@@ -35,7 +35,7 @@ for (let days = START; days <= END; days++) {
 	const canvas = renderFrame(bg.buffer, days);
 	canvas.createPNGStream().pipe(createWriteStream(`generated/static/${days}.png`));
 	if (days === 1 || days === 5 || days % 10 === 0) {
-		const canvas = renderFrame(bg, days);
+		const canvas = renderFrame(null, days);
 		canvas.createPNGStream().pipe(createWriteStream(`generated/static/${days}-overlay.png`));
 	}
 }
