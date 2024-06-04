@@ -26,24 +26,25 @@ expose({
 		subject.complete();
 		subject = new Subject();
 	},
-	async preprocess(file, options) {
-		const buffer = readFileSync(file);
+	async preprocess(dir, file, options) {
+		const buffer = readFileSync(dir + file);
 		const md5 = createHash('md5').update(buffer).digest('hex');
 		let img = sharp(buffer, options);
 		const meta = await img.metadata();
 		const cachePath = `generated/.cache/${md5}.${meta.format}`;
 		let data = {
+			n: file,
 			frames: meta.pages,
 			delay: meta.delay,
 			loops: meta.loop,
 			path: cachePath,
 		};
 		if (existsSync(cachePath)) {
-			debug('%s is cached', file);
+			debug('%s is cached', dir + file);
 			// Buffer.buffer = ArrayBuffer
 			data.buffer = readFileSync(cachePath).buffer;
 		} else {
-			debug('processing %s', file);
+			debug('processing %s', dir + file);
 			img = img
 				.resize(WIDTH, HEIGHT)
 				.modulate({ brightness: 0.75 });
