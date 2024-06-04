@@ -7,6 +7,7 @@ import { START, END, DEBUG } from './config.js';
 import loadImages from './load.js';
 import { createWriteStream } from 'fs';
 import useThreads from './threads.js';
+import { Transfer } from 'threads';
 
 createDebug.enable(DEBUG);
 const debug = createDebug('images');
@@ -32,7 +33,7 @@ const tasks = [];
 for (let days = START; days <= END; days++) {
 	const bg = backgrounds.static[sbg];
 	tasks.push({
-		task: (worker) => worker.createPNG(bg, days),
+		task: (worker) => worker.createPNG(Transfer(bg.buffer), days),
 		// `buffer` is an ArrayBuffer
 		callback: (buffer) => createWriteStream(`generated/static/${days}.png`).write(Buffer.from(buffer)),
 	});
@@ -42,7 +43,7 @@ for (let days = START; days <= END; days++) {
 		const bg = backgrounds.animated[abg];
 		if (sbg === backgrounds.static.length) sbg = 0;
 		tasks.push({
-			task: (generator) => generator.createGIF(bg, days),
+			task: (generator) => generator.createGIF(Transfer(bg.buffer), days),
 			callback: (buffer) => createWriteStream(`generated/animated/${days}.png`).write(Buffer.from(buffer)),
 		});
 		abg++;

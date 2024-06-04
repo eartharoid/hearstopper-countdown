@@ -31,6 +31,7 @@ expose({
 	},
 	async createGIF(bg, days) {
 		debug('generating %d.gif', days);
+		bg = Buffer.from(bg);
 		const { frames } = await GifUtil.read(bg.buffer);
 		const renderer = new Renderer();
 		const encoder = new GIFEncoder(WIDTH, HEIGHT);
@@ -56,6 +57,7 @@ expose({
 	},
 	async createPNG(bg, days) {
 		debug('generating %d.png', days);
+		bg = Buffer.from(bg);
 		const renderer = new Renderer();
 		const image = createImageData(bg.buffer, WIDTH, HEIGHT);
 		const buffer = renderer.renderFrame(image, days).canvas.toBuffer();
