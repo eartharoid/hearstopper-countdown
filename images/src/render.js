@@ -1,10 +1,18 @@
 import {
 	createCanvas,
+	Image,
 } from 'canvas';
-import { WIDTH, HEIGHT, FONT } from './config.js';
-import { createImageData } from './utils.js';
+import { FONT, WIDTH, HEIGHT } from './config.js';
+// import { createImageData } from './utils.js';
 
 // registerFont('assets/fonts/HEAVYRUST.ttf', { family: 'HEAVYRUST' });
+
+const drawImage = (ctx, buffer, x = 0, y = 0) => {
+	const img = new Image();
+	img.onload = () => ctx.drawImage(buffer, x, y);
+	img.onerror = err => { throw err; };
+	img.src = img;
+}
 
 export default class Renderer {
 	constructor() {
@@ -14,13 +22,16 @@ export default class Renderer {
 	renderFrame(bg, days) {
 		const canvas = createCanvas(WIDTH, HEIGHT);
 		const ctx = canvas.getContext('2d');
-
+		
 		// load previous background
 		if (this.previous) {
-			ctx.putImageData(createImageData(this.previous, WIDTH, HEIGHT), 0, 0);
+			// ctx.putImageData(this.previous, 0, 0);
+			drawImage(ctx, this.previous);
 		}
-
-		ctx.putImageData(bg, 0, 0);
+		
+		// ctx.putImageData(bg, 0, 0);
+		drawImage(ctx, bg);
+		// this.previous = createImageData(canvas.toBuffer(), WIDTH, HEIGHT);
 		this.previous = canvas.toBuffer();
 
 		ctx.textAlign = 'center';

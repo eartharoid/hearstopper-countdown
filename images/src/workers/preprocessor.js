@@ -36,6 +36,7 @@ expose({
 			frames: meta.pages,
 			delay: meta.delay,
 			loops: meta.loop,
+			path: cachePath,
 		};
 		if (existsSync(cachePath)) {
 			debug('%s is cached', file);

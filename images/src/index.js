@@ -1,13 +1,17 @@
-// ! `sharp` (load.js) MUST be imported **AFTER** `canvas` (render.js) to avoid conflict:
+import createDebug from 'debug';
+import { START, END, DEBUG, WIDTH, HEIGHT } from './config.js';
+import loadImages from './load.js';;
+// import { createGIF, createPNG } from './modules/generator.js';
+import { writeFileSync } from 'node:fs';
+import { GifUtil } from 'gifwrap';
+import GIFEncoder from 'gif-encoder-2';
+// import { createImageData } from './utils.js';
+import Renderer from './render.js';
+// ! `sharp` MUST be imported AFTER `canvas` (Renderer) to avoid conflict:
 // https://github.com/Automattic/node-canvas/issues/1386
 // https://github.com/Automattic/node-canvas/issues/930
+// import sharp from 'sharp';
 
-import createDebug from 'debug';
-import { START, END, DEBUG } from './config.js';
-import loadImages from './load.js';
-import { createWriteStream } from 'fs';
-import useThreads from './threads.js';
-import { Transfer } from 'threads';
 
 createDebug.enable(DEBUG);
 const debug = createDebug('images');
@@ -28,33 +32,46 @@ debug('Loaded %d static backgrounds', backgrounds.static.length);
 let abg = 0;
 let sbg = 0;
 
-const tasks = [];
-
 for (let days = START; days <= END; days++) {
+	debug('Generating %d.png', days);
 	const bg = backgrounds.static[sbg];
-	tasks.push({
-		task: (worker) => worker.createPNG(Transfer(bg.buffer), days),
-		// `buffer` is an ArrayBuffer
-		callback: (buffer) => createWriteStream(`generated/static/${days}.png`).write(Buffer.from(buffer)),
-	});
+	const renderer = new Renderer();
+	// const image = createImageData(bg.buffer, WIDTH, HEIGHT);
+	// const png = renderer.renderFrame(image, days).canvas.createPNGStream();
+	// png.pipe(createWriteStream(`generated/static/${days}.png`));
+	const canvas = renderer.renderFrame(bg.buffer, days).canvas;
+	writeFileSync(`generated/static/${days}.png`, canvas.toBuffer());
 	sbg++;
 	if (sbg === backgrounds.static.length) sbg = 0;
 	if (days === 1 || days === 5 || days % 10 === 0) {
+		debug('Generating %d.gif', days);
 		const bg = backgrounds.animated[abg];
 		if (sbg === backgrounds.static.length) sbg = 0;
-		tasks.push({
-			task: (generator) => generator.createGIF(Transfer(bg.buffer), days),
-			callback: (buffer) => createWriteStream(`generated/animated/${days}.png`).write(Buffer.from(buffer)),
-		});
+		const { frames } = await GifUtil.read(bg.buffer);
+		const renderer = new Renderer();
+		const encoder = new GIFEncoder(WIDTH, HEIGHT);
+		// encoder.createReadStream().pipe(createWriteStream(`generated/animated/${days}.gif`));
+		encoder.setQuality(5); // 1 (best/slowest) - 30 (worst/fastest)
+		encoder.setRepeat(bg.loops);
+		encoder.start();
+		for (let f = 0; f < frames.length; f++) {
+			encoder.setDelay(bg.delay[f]);
+			const frame = frames[f];
+			// const trimmed = sharp(frame.bitmap.data)
+			// 	.trim({
+			// 		threshold: 0,
+			// 		background: '#000000'
+			// 	});
+			// const { width, height } = await trimmed.metadata();
+			// const image = createImageData(await trimmed.toBuffer(), width, height);
+			const ctx = renderer.renderFrame(frame.bitmap.data, days);
+			encoder.addFrame(ctx);
+		}
+		encoder.finish();
+		writeFileSync(`generated/animated/${days}.gif`, encoder.out.getData());
 		abg++;
 		if (abg === backgrounds.animated.length) abg = 0;
 	}
 }
-
-await useThreads({
-	workerName: 'generator',
-	workerPath: './workers/generator.js',
-	tasks,
-});
 
 debug('WAIT FOR WRITE STREAMS TO COMPLETE');
